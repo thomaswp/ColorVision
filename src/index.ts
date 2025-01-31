@@ -6,9 +6,9 @@ console.log('Hello, TypeScript and Webpack!');
 
 const colorVision = {
     peaks: [
-        { mean: 440, stdDev: 15, intensity: 1 },
-        { mean: 530, stdDev: 25, intensity: 1 },
-        { mean: 560, stdDev: 30, intensity: 1 },
+        { mean: 440, stdDev: 30, intensity: 1 },
+        { mean: 530, stdDev: 45, intensity: 1 },
+        { mean: 560, stdDev: 50, intensity: 1 },
     ]
 } as WavelengthDistribution;
 
@@ -19,17 +19,32 @@ const redGreen = {
     ]
 }
 
-const visionViz = new WavelengthDistViz(colorVision, 500, 400, 350, 750);
+const minWavelength = 400;
+const maxWavelength = 700;
+
+const visionViz = new WavelengthDistViz(colorVision, 500, 400, minWavelength, maxWavelength);
 document.body.appendChild(visionViz.canvas);
 visionViz.render();
 
-const redGreenViz = new WavelengthDistViz(redGreen, 500, 400, 350, 750);
+const redGreenViz = new WavelengthDistViz(redGreen, 500, 400, minWavelength, maxWavelength);
 document.body.appendChild(redGreenViz.canvas);
 redGreenViz.render();
 
 const perceptions = getPerception(colorVision, redGreen);
 console.log(perceptions);
 
-const perceptionViz = new PerceptionViz(perceptions, 200, 200, 350, 750);
+const perceptionViz = new PerceptionViz(perceptions, 200, 200);
 document.body.appendChild(perceptionViz.canvas);
 perceptionViz.render();
+
+visionViz.onEdited.addListener(() => {
+    const perceptions = getPerception(colorVision, redGreen);
+    perceptionViz.update(perceptions);
+    perceptionViz.render();
+});
+
+redGreenViz.onEdited.addListener(() => {
+    const perceptions = getPerception(colorVision, redGreen);
+    perceptionViz.update(perceptions);
+    perceptionViz.render();
+});

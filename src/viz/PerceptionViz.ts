@@ -10,13 +10,16 @@ export class PerceptionViz {
         private perceptions: ColorPerceptions, 
         public readonly width: number, 
         public readonly height: number,
-        public readonly minWaveLength: number,
-        public readonly maxWaveLength: number,
         public dotDimension = 10,
     ) {
         this.canvas = document.createElement("canvas");
         this.canvas.width = width;
         this.canvas.height = height;
+    }
+
+    public update(perceptions: ColorPerceptions) {
+        this.perceptions = perceptions;
+        this.render();
     }
 
     render() {
