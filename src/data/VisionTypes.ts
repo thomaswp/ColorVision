@@ -25,7 +25,7 @@ export const dogVision = {
 
 export const panVision = {
     peaks: Array.from({ length: 7 }, (_, i) => ({
-        mean: 410 + i * 45,
+        mean: 420 + i * 35,
         stdDev: 20,
         intensity: 1,
     }))

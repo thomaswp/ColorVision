@@ -16,7 +16,7 @@ const visionTypes = [
 ].map(v => ({ ...v }));
 
 const minWavelength = 400;
-const maxWavelength = 700;
+const maxWavelength = 680;
 
 const grid = new VizGrid(300, 200, visionTypes, allSources, minWavelength, maxWavelength);
 document.body.appendChild(grid.container);
