@@ -10,7 +10,7 @@ export class PerceptionViz {
         private perceptions: ColorPerceptions, 
         public readonly width: number, 
         public readonly height: number,
-        public dotDimension = 10,
+        public dotDimension = 20,
     ) {
         this.canvas = document.createElement("canvas");
         this.canvas.width = width;
@@ -43,12 +43,23 @@ export class PerceptionViz {
         }
         shuffle(dots, "1234");
 
+        ctx.fillRect(0, 0, this.width, this.height);
         for (let i = 0; i < nDots; i++) {
             const x = i % this.dotDimension;
             const y = Math.floor(i / this.dotDimension);
             const dotColor = dots[i];
             ctx.fillStyle = dotColor.string();
-            ctx.fillRect(x * this.width / this.dotDimension, y * this.height / this.dotDimension, this.width / this.dotDimension, this.height / this.dotDimension);
+
+            ctx.beginPath();
+            ctx.ellipse(
+                (x + 0.5) * this.width / this.dotDimension,
+                (y + 0.5) * this.height / this.dotDimension,
+                this.width / this.dotDimension / 2,
+                this.height / this.dotDimension / 2,
+                0, 0, 2 * Math.PI
+            );
+            ctx.fill();
+            // ctx.fillRect(x * this.width / this.dotDimension, y * this.height / this.dotDimension, this.width / this.dotDimension + 0.5, this.height / this.dotDimension + 0.5);
         }
     }
 }

@@ -1,7 +1,8 @@
-import { getBellCurve, WavelengthDistribution, WavelengthPeak } from "../data/Wavelengths";
+import { getBellCurve, getPerception, WavelengthDistribution, WavelengthPeak } from "../data/Wavelengths";
 import Color from "color";
 import { wavelengthToRGB as wavelengthToColor } from "../util/ColorConverter";
 import { EventEmitter } from "../util/Util";
+import { humanTricolorVision } from "../data/VisionTypes";
 
 type Point = {x: number, y: number};
 
@@ -21,6 +22,7 @@ export class WavelengthDistViz {
         public readonly height: number,
         public readonly minWaveLength: number,
         public readonly maxWaveLength: number,
+        public readonly showColor: boolean,
     ) {
         this.canvas = document.createElement("canvas");
         this.canvas.width = width;
@@ -62,7 +64,7 @@ export class WavelengthDistViz {
             const wavelength = this.xToWavelength(e.offsetX);
             const intensity = 1 - e.offsetY / this.height;
             this.resetDrag();
-            this.dist.peaks.push({ mean: wavelength, stdDev: 10, intensity });
+            this.dist.peaks.push({ mean: wavelength, stdDev: 25, intensity });
             this.render();
             this.onEdited.emit();
         });
@@ -75,10 +77,41 @@ export class WavelengthDistViz {
         this.startPosition = null;
     }
 
+    getMeanColorQuick() {
+        let totalIntensity = 0;
+        let r = 0, g = 0, b = 0;
+        for (let peak of this.dist.peaks) {
+            const color = wavelengthToColor(peak.mean);
+            r += color.red() * peak.intensity;
+            g += color.green() * peak.intensity;
+            b += color.blue() * peak.intensity;
+        }
+        r = Math.min(Math.max(r, 0), 255);
+        g = Math.min(Math.max(g, 0), 255);
+        b = Math.min(Math.max(b, 0), 255);
+        return Color.rgb(r, g, b);
+    }
+
+    getHumanColor() {
+        const perceptions = getPerception(humanTricolorVision, this.dist);
+        return Color.rgb(
+            perceptions[0].intensity * 255,
+            perceptions[1].intensity * 255,
+            perceptions[2].intensity * 255,
+        );
+    }
+
     render() {
         let ctx = this.canvas.getContext("2d")!;
         ctx.clearRect(0, 0, this.width, this.height);
+
+        if (this.showColor) {
+            ctx.strokeStyle = this.getMeanColorQuick().toString();
+            ctx.lineWidth = 10;
+            ctx.strokeRect(5, 5, this.width - 10, this.height - 10);
+        }
         ctx.strokeStyle = "black";
+        ctx.lineWidth = 1;
         ctx.strokeRect(0, 0, this.width, this.height);
 
         for (let peak of this.dist.peaks) {
